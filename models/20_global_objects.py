@@ -169,7 +169,7 @@ class G_projects(object):
         if request.args(0) and person.last_projects:
             # on page project
             project_id = int(request.args(0))
-            order = json.loads(person.last_projects)
+            order = json.loads('["{0}"]'.format(person.id))
 
             if order[0] == project_id:
                 final_order = order
@@ -191,12 +191,11 @@ class G_projects(object):
 
         elif person.last_projects:
             # on index
-            order = json.loads(person.last_projects)
-            last_projects = self.lastProjectsData(order)
-
-        else:
-            # on index
-            last_projects = db( (Sharing.person_id == person_id) &
+            try:
+                order = json.loads('["{0}"]'.format(person.last_projects))
+                last_projects = self.lastProjectsData(order)
+            except Exception:
+                last_projects = db( (Sharing.person_id == person_id) &
                         (Project.id == Sharing.project_id ) ).select(orderby=~Project.id,limitby=(0, 4))
 
 
